@@ -1,25 +1,37 @@
-import type { AxiosInstance } from 'axios';
-import axios from 'axios';
-import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '../utils/LocalStore';
-
+import type { AxiosInstance } from "axios";
+import axios from "axios";
+import { store } from "../redux/store";
+import {
+    logout,
+    setAccessToken
+} from "../redux/slice/authSlice";
 const apiClient: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
     timeout: 100000,
+    withCredentials: true
+});
+const refreshClient = axios.create({
+    baseURL: import.meta.env.VITE_BASE_URL,
+    withCredentials: true
 });
 
-// Thêm access token vào mỗi request
 apiClient.interceptors.request.use((config) => {
-    const accessToken = getAccessToken();
+    const accessToken = store.getState().auth.accessToken;
+
     if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
     return config;
 });
-// Quản lý refresh token
+
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (
+    error: any,
+    token: string | null = null
+) => {
     failedQueue.forEach((prom) => {
         if (error) {
             prom.reject(error);
@@ -27,22 +39,26 @@ const processQueue = (error: any, token: string | null = null) => {
             prom.resolve(token);
         }
     });
+
     failedQueue = [];
 };
 
-// Xử lý response
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        // Nếu token hết hạn
-        if (error.response?.status === 401 && !originalRequest._retry) {
+
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry
+        ) {
             if (isRefreshing) {
-                return new Promise(function (resolve, reject) {
+                return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
                     .then((token) => {
-                        originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                        originalRequest.headers.Authorization =
+                            `Bearer ${token}`;
                         return apiClient(originalRequest);
                     })
                     .catch((err) => Promise.reject(err));
@@ -52,19 +68,25 @@ apiClient.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/refresh_token`, {
-                    refresh_token: getRefreshToken(),
-                });
+                const res = await refreshClient.post(
+                    "/auth/refresh_token"
+                );
+
                 const newToken = res.data.access_token;
-                const newRefreshToken = res.data.refresh_token;
-                setTokens(newToken, newRefreshToken);
-                apiClient.defaults.headers.common['Authorization'] = 'Bearer ' + newToken;
+
+                store.dispatch(setAccessToken(newToken));
+
                 processQueue(null, newToken);
-                return apiClient(originalRequest); // retry request cũ
+
+                originalRequest.headers.Authorization =
+                    `Bearer ${newToken}`;
+
+                return apiClient(originalRequest);
             } catch (err) {
                 processQueue(err, null);
-                clearTokens();
-                //window.location.href = '/login'; // logout
+
+                store.dispatch(logout());
+                window.location.replace("/dang-nhap");
                 return Promise.reject(err);
             } finally {
                 isRefreshing = false;
@@ -72,7 +94,7 @@ apiClient.interceptors.response.use(
         }
 
         return Promise.reject(error);
-    },
+    }
 );
 
 export default apiClient;

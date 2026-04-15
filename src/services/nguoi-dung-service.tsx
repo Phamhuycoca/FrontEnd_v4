@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 import { BaseService } from './baseService';
 
-class NguoiDungService extends BaseService<any> {
+class NguoiDungService extends BaseService {
     private sendToViewSubject = new Subject<any>();
     public sendToView$ = this.sendToViewSubject.asObservable();
     constructor() {

@@ -1,20 +1,21 @@
 import { BehaviorSubject, catchError, from, map, Observable, Subject, throwError } from 'rxjs';
 import apiClient from '../api/apiClient';
+import type { ResponseData } from '../utils/interfaces';
 export interface refreshList {
     mode: 'create' | 'update' | 'delete';
 }
-export interface typeModal<T> {
+export interface typeModal {
     open: boolean;
     mode: 'create' | 'update' | 'delete' | 'view' | 'close';
-    record?: T;
+    record?: any;
 }
-export class BaseService<T> {
+export class BaseService {
     private url: string;
     constructor(url: string) {
         this.url = url;
     }
     private refreshSubject = new Subject<refreshList>();
-    private modalSubject = new BehaviorSubject<typeModal<T>>({
+    private modalSubject = new BehaviorSubject<typeModal>({
         open: false,
         mode: 'create',
     });
@@ -35,15 +36,15 @@ export class BaseService<T> {
         );
     }
     // ================= GET ONE =================
-    protected getOne<R = any, D = any>(data?: D): Observable<R> {
-        return from(apiClient.post<R>(this.url, data)).pipe(
+    protected getOne<R = any>(id: string): Observable<ResponseData<R>> {
+        return from(apiClient.get<ResponseData<R>>(this.url + `/${id}`)).pipe(
             map((res) => res.data),
             catchError((err) => this.handleError(err, 'get data')),
         );
     }
     // ================= POST =================
-    protected post<R = any, D = any>(data?: D): Observable<R> {
-        return from(apiClient.post<R>(this.url, data)).pipe(
+    protected post<R = any, D = any>(data?: D): Observable<ResponseData<R>> {
+        return from(apiClient.post<ResponseData<R>>(this.url, data)).pipe(
             map((res) => {
                 return res.data;
             }),
@@ -51,8 +52,8 @@ export class BaseService<T> {
         );
     }
     // ================= UPDATE =================
-    protected put<R = any, D = any>(id: string, data?: D): Observable<R> {
-        return from(apiClient.put<R>(this.url + `/${id}`, data)).pipe(
+    protected put<R = any, D = any>(id: string, data?: D): Observable<ResponseData<R>> {
+        return from(apiClient.put<ResponseData<R>>(this.url + `/${id}`, data)).pipe(
             map((res) => {
                 return res.data;
             }),
@@ -60,8 +61,8 @@ export class BaseService<T> {
         );
     }
     // ================= DELETE =================
-    protected del<R = any>(id: string | number): Observable<R> {
-        return from(apiClient.delete<R>(this.url + `/${id}`)).pipe(
+    protected del<R = any>(id: string | number): Observable<ResponseData<R>> {
+        return from(apiClient.delete<ResponseData<R>>(this.url + `/${id}`)).pipe(
             map((res) => {
                 return res.data;
             }),
@@ -103,7 +104,7 @@ export class BaseService<T> {
     // ================= MODAL =================
     openModal(
         mode: 'create' | 'update' | 'delete' | 'view',
-        record?: T
+        record?: any
     ) {
         this.modalSubject.next({
             open: true,
