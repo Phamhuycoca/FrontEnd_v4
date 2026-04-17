@@ -19,7 +19,6 @@ import viVN from 'antd/locale/vi_VN';
 const { Search } = Input;
 export const TableList = (props: TableListProps) => {
     const {
-        key,
         page,
         page_size,
         loading,
@@ -197,9 +196,10 @@ export const TableList = (props: TableListProps) => {
                                 showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} bản ghi`,
                                 pageSizeOptions: ['10', '20', '50', '100'],
                             }}
-                            rowKey={(record: any) => (key || record.id) || JSON.stringify(record)}
                             onChange={(pagination, filters, sorter) => {
                                 const sort = (!Array.isArray(sorter) && sorter.field) ? { [String(sorter.field)]: sorter.order === "ascend" ? 0 : 1 } : { [String(columns[0].key)]: 1 };
+                                console.log('sort', sort);
+
                                 onChange?.({
                                     page: pagination.current || 1,
                                     pageSize: pagination.pageSize || 20,

@@ -1,14 +1,14 @@
-import type { VaiTroType } from "../modules/dm-vai-tro/vai-tro";
+import type { DanhMucType } from "../../modules/dm-danh-muc/danh-muc";
 import { BaseService } from "./baseService";
 
-class VaiTroService extends BaseService {
+class DanhMucService extends BaseService {
     constructor() {
-        super('vai-tro');
+        super('danh-muc')
     }
-    create(data: VaiTroType) {
+    create(data: DanhMucType) {
         return this.post(data);
     }
-    update(id: string, data: VaiTroType) {
+    update(id: string, data: DanhMucType) {
         return this.put(id, data)
     }
     delete(id: string) {
@@ -21,4 +21,4 @@ class VaiTroService extends BaseService {
         return this.getOne(id)
     }
 }
-export default new VaiTroService();
+export default new DanhMucService;

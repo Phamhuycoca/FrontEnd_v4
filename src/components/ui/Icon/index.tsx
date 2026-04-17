@@ -1,1 +1,1 @@
-export * from './Conify'
+export * from './Icon'

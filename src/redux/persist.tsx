@@ -1,7 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/es/storage";
-import { authReducer, danhMucReducer, vaitroReducer } from "./slice";
+import { authReducer, chucNangReducer, danhMucReducer, nguoiDungReducer, vaitroReducer } from "./slice";
 // Ghi nhớ các key ko bị mất khi reload
 const authPersistConfig = {
     key: "auth",
@@ -18,5 +18,7 @@ const authPersistConfig = {
 export const persistedReducer = combineReducers({
     auth: persistReducer(authPersistConfig, authReducer),
     vaitro: vaitroReducer,
-    danhmuc: danhMucReducer
+    danhmuc: danhMucReducer,
+    nguoidung: nguoiDungReducer,
+    chucnang: chucNangReducer
 });

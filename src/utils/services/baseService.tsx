@@ -1,6 +1,6 @@
 import { BehaviorSubject, catchError, from, map, Observable, Subject, throwError } from 'rxjs';
-import apiClient from '../api/apiClient';
-import type { ResponseData } from '../utils/interfaces';
+import apiClient from '../../api/apiClient';
+import type { ResponseData } from '../interfaces';
 export interface refreshList {
     mode: 'create' | 'update' | 'delete';
 }

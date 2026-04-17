@@ -2,10 +2,10 @@ import { Form, Input, Row, Space, Spin } from "antd";
 import { CloseButton, CommonButton, DeleteButton, EditButton, SaveButton } from "../../components/ui/Button";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import vaiTroService from "../../services/vai-tro-service";
+import vaiTroService from "../../utils/services/vai-tro-service";
 import type { VaiTroType } from "./vai-tro";
-import confirmService from "../../services/confirm-service";
-
+import confirmService from "../../utils/services/confirm-service";
+import { PhanQuyenVaiTroModal } from "./modal";
 export const EpsForm = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
@@ -74,7 +74,10 @@ export const EpsForm = () => {
                         {editMode ? (
                             <Space>
                                 <CommonButton
-                                    text="Phân quyền"
+                                    text="Phân quyền vai trò"
+                                    onClick={() => {
+                                        vaiTroService.openModal("create", id);
+                                    }}
                                 />
                                 <EditButton
                                     onClick={() => {
@@ -126,6 +129,7 @@ export const EpsForm = () => {
                     </Form.Item>
                 </Form>
             </Spin>
+            <PhanQuyenVaiTroModal />
         </>
     )
 }

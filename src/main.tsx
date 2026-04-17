@@ -9,6 +9,7 @@ import { store, persistor } from './redux/store.tsx';
 import { PersistGate } from 'redux-persist/integration/react';
 import { GlobalAlert } from './components/ui/Global/Alert.tsx';
 import { GlobalConfirm } from './components/ui/Global/Confirm.tsx';
+import { GlobalMessage } from './components/ui/Global/Message.tsx';
 createRoot(document.getElementById('root')!).render(
   <StyleProvider hashPriority="high">
     <ConfigProvider theme={{ cssVar: { key: 'app' }, hashed: false }}>
@@ -35,6 +36,7 @@ createRoot(document.getElementById('root')!).render(
                   return <Route key={route.path} path={route.path} element={route.element} />;
                 })}
               </Routes>
+              <GlobalMessage />
               <GlobalAlert />
               <GlobalConfirm />
             </Router>

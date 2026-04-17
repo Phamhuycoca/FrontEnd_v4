@@ -4,57 +4,46 @@ import { TableList } from "../../components/ui/Table";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
 import { useDispatch } from "react-redux";
-import { setData, setMeta } from "../../redux/slice/danhMucSlice";
 import { CreateButton } from "../../components/ui/Button";
-import danhMucService from "../../utils/services/danh-muc-service";
-import { Icon } from "../../components/ui/Icon";
+import chucNangService from "../../utils/services/chuc-nang-service";
+import { setData, setMeta } from "../../redux/slice/chucNangSlice";
 
 export const EpsList = () => {
     const [columns, setColumns] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { data, meta } = useAppSelector(state => state.danhmuc);
+    const { data, meta } = useAppSelector(state => state.chucnang);
     useEffect(() => {
-        const sub = danhMucService.refresh$.subscribe(() => {
+        const sub = chucNangService.refresh$.subscribe(() => {
             fetchData();
         });
 
         return () => sub.unsubscribe();
     }, []);
+
     useEffect(() => {
         fetchData();
     }, [meta]);
     useEffect(() => {
         setColumns([
             {
-                title: 'Tên',
+                title: 'Mã chức năng',
+                dataIndex: 'ma',
+                sorter: true,
+                key: 'ma',
+                render: (_: any, record: any) => <Link to={`${record.id}`}>{record.ma}</Link>,
+            },
+            {
+                title: 'Tên chức năng',
                 dataIndex: 'ten',
                 key: 'ten',
-                render: (_: any, record: any) => <Link to={`${record.id}`}>{record.ten}</Link>,
             },
-            {
-                title: 'Đường dẫn',
-                dataIndex: 'duong_dan',
-            },
-            {
-                title: 'Icon',
-                dataIndex: 'icon',
-                render: (_: any, record: any) => <Icon icon={record.icon} />,
-            },
-            {
-                title: 'Số thứ tự',
-                dataIndex: 'so_thu_tu',
-            },
-            {
-                title: 'Cấp cha',
-                dataIndex: 'cap_cha_ten',
-            }
         ])
     }, [meta.page, meta.page_size]);
     const fetchData = () => {
         setLoading(true);
-        danhMucService.getList(meta).subscribe((res) => {
+        chucNangService.getList(meta).subscribe((res) => {
             dispatch(setData(res.data));
             setLoading(false);
         }, err => {
@@ -65,18 +54,14 @@ export const EpsList = () => {
     return (
         <>
             <Breadcrumb
-                items={[{ title: 'Trang chủ' }, { title: 'Quản lý danh mục' }]}
+                items={[{ title: 'Trang chủ' }, { title: 'Quản lý chức năng' }]}
                 className="mb-3"
             />
-            <Row gutter={16}>
+            <Row gutter={[16, 16]}>
                 <Col md={12}>
                     <Row gutter={[0, 16]}>
                         <Col span={24}>
                             <TableList
-                                expandable={{
-                                    defaultExpandAllRows: true,
-                                    showExpandColumn: true
-                                }}
                                 columns={columns}
                                 loading={loading}
                                 dataSource={data}

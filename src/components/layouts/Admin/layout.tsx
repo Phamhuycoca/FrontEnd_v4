@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     BellOutlined,
     CloseCircleOutlined,
@@ -17,16 +17,13 @@ import {
     Input,
     Layout,
     List,
-    Menu,
     Row,
     Space,
     theme,
 } from 'antd';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { createStyles } from 'antd-style';
-import { useAppSelector } from '../../../redux/hooks';
-import type { MenuResponse } from '../../../types/AuthType';
-
+import { MenuComponent } from '../../ui/Menu';
 const { Header, Content, Sider } = Layout;
 const items: MenuProps['items'] = [
     {
@@ -93,23 +90,7 @@ const AdminLayout: React.FC = () => {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
     const { styles, cx } = useStyles();
-    const navigate = useNavigate();
-    const menu = useAppSelector(state => state.auth.menu);
     const [collapsed, setCollapsed] = useState<boolean>(false);
-    useEffect(() => {
-    }, [menu]);
-    const mapMenuToAntd = (
-        menus: MenuResponse[]
-    ): MenuProps["items"] => {
-        return menus.map((item) => ({
-            key: item.duong_dan,
-            label: item.ten,
-            icon: item.icon ? item.icon : undefined,
-            children: item.children?.length
-                ? mapMenuToAntd(item.children)
-                : undefined
-        }));
-    };
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider
@@ -120,15 +101,7 @@ const AdminLayout: React.FC = () => {
                 collapsedWidth={0}
                 trigger={null}
             >
-                <Menu
-                    theme="light"
-                    defaultSelectedKeys={['1']}
-                    mode="inline"
-                    items={mapMenuToAntd(menu)}
-                    onClick={(e) => {
-                        navigate(e.key);
-                    }}
-                />
+                <MenuComponent />
             </Sider>
             <Layout>
                 <Header

@@ -3,7 +3,7 @@ import reactLogo from './assets/react.svg';
 import viteLogo from './assets/vite.svg';
 import heroImg from './assets/hero.png';
 import './App.css';
-import nguoiDungService from './services/nguoi-dung-service';
+import nguoiDungService from './utils/services/nguoi-dung-service';
 
 function App() {
   const [count, setCount] = useState(0);

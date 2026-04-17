@@ -1,12 +1,10 @@
-import { Form, Input, InputNumber, Row, Space, Spin, TreeSelect } from "antd";
+import { Form, Input, Row, Space, Spin } from "antd";
 import { CloseButton, DeleteButton, EditButton, SaveButton } from "../../components/ui/Button";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import type { ChucNangType } from "./chuc-nang";
 import confirmService from "../../utils/services/confirm-service";
-import type { DanhMucType } from "./danh-muc";
-import danhMucService from "../../utils/services/danh-muc-service";
-import { ConvertTreeSelect } from "../../utils/helpers/Convert";
-import messageService from "../../utils/services/message-service";
+import chucNangService from "../../utils/services/chuc-nang-service";
 
 export const EpsForm = () => {
     const navigate = useNavigate();
@@ -14,12 +12,45 @@ export const EpsForm = () => {
     const { id } = useParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [editMode, setEditMode] = useState<boolean>(false);
-    const [danhMucList, setDanhMucList] = useState<any[]>([]);
-    useEffect(() => {
-        fetchDanhMucList();
+    const onFinish = (values: ChucNangType) => {
         if (id && id !== 'new') {
             setIsLoading(true);
-            danhMucService.getById(id).subscribe(
+            const data = { ...values, id };
+            chucNangService.update(id, data).subscribe(
+                (res) => {
+                    if (res) {
+                        setEditMode(true);
+                        setIsLoading(false);
+                        chucNangService.refreshList('update');
+                    }
+                },
+                (err) => {
+                    console.log(err);
+                    setIsLoading(false);
+                },
+            );
+        } else {
+            setIsLoading(true);
+            chucNangService.create(values).subscribe(
+                (res) => {
+                    if (res) {
+                        setIsLoading(false);
+                        setEditMode(true);
+                        navigate(`../${res.data.id}`);
+                        chucNangService.refreshList('create');
+                    }
+                },
+                (err) => {
+                    console.log(err);
+                    setIsLoading(false);
+                },
+            );
+        }
+    };
+    useEffect(() => {
+        if (id && id !== 'new') {
+            setIsLoading(true);
+            chucNangService.getById(id).subscribe(
                 (res) => {
                     form.setFieldsValue(res.data);
                     setEditMode(true);
@@ -35,56 +66,6 @@ export const EpsForm = () => {
             setEditMode(false);
         }
     }, [id]);
-    const onFinish = (values: DanhMucType) => {
-        if (id && id !== 'new') {
-            setIsLoading(true);
-            const data = { ...values, id };
-            danhMucService.update(id, data).subscribe(
-                (res) => {
-                    if (res) {
-                        messageService.success(res?.message);
-                        setEditMode(true);
-                        setIsLoading(false);
-                        danhMucService.refreshList('update');
-                    }
-                },
-                (err) => {
-                    messageService.error(err?.response.data.Message);
-                    console.log(err);
-                    setIsLoading(false);
-                },
-            );
-        } else {
-            setIsLoading(true);
-            danhMucService.create(values).subscribe(
-                (res) => {
-                    if (res) {
-                        messageService.success(res?.message);
-                        setIsLoading(false);
-                        setEditMode(true);
-                        navigate(`../${res.data.id}`);
-                        danhMucService.refreshList('create');
-                    }
-                },
-                (err) => {
-                    messageService.error(err?.response.data.Message);
-                    console.log(err);
-                    setIsLoading(false);
-                },
-            );
-        }
-    };
-
-    const fetchDanhMucList = () => {
-        danhMucService.getList().subscribe(
-            (res) => {
-                setDanhMucList(ConvertTreeSelect(res.data));
-            },
-            (error) => {
-                console.error(error);
-            },
-        );
-    };
     return (
         <>
             <Spin spinning={isLoading}>
@@ -101,19 +82,16 @@ export const EpsForm = () => {
                                     onClick={async () => {
                                         const confirm = await confirmService.confirm();
                                         if (confirm) {
-                                            danhMucService.delete(id).subscribe(
+                                            chucNangService.delete(id).subscribe(
                                                 (res) => {
-
                                                     if (res) {
-                                                        messageService.success(res?.message);
                                                         setIsLoading(false);
                                                         setEditMode(true);
-                                                        navigate(`..`, { replace: true });
-                                                        danhMucService.refreshList('delete');
+                                                        navigate(`../`, { replace: true });
+                                                        chucNangService.refreshList('delete');
                                                     }
                                                 },
                                                 (err) => {
-                                                    messageService.error(err?.response.data.Message);
                                                     console.log(err);
                                                     setIsLoading(false);
                                                 },
@@ -136,23 +114,12 @@ export const EpsForm = () => {
                         />
                     </Space>
                 </Row>
-                <Form form={form} onFinish={onFinish} className="mt-4" labelAlign="left"
-                    labelCol={{ span: 6 }}
-                    wrapperCol={{ span: 16 }}>
-                    <Form.Item label="Tên danh mục" name="ten">
+                <Form form={form} onFinish={onFinish} className="mt-4">
+                    <Form.Item name={'ma'} label="Mã">
                         <Input disabled={editMode} />
                     </Form.Item>
-                    <Form.Item label="Đường dẫn" name="duong_dan">
+                    <Form.Item name={'ten'} label="Tên">
                         <Input disabled={editMode} />
-                    </Form.Item>
-                    <Form.Item label="Icon" name="icon">
-                        <Input disabled={editMode} />
-                    </Form.Item>
-                    <Form.Item label="Số thứ tự" name="so_thu_tu">
-                        <InputNumber min={0} disabled={editMode} />
-                    </Form.Item>
-                    <Form.Item label="Cấp cha" name="cap_cha_id">
-                        <TreeSelect disabled={editMode} allowClear treeData={danhMucList} title="Chọn cấp cha" />
                     </Form.Item>
                 </Form>
             </Spin>

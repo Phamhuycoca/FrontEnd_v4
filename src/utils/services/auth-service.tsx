@@ -1,4 +1,4 @@
-import type { AuthResponse } from "../types/AuthType";
+import type { AuthResponse } from "../../types/AuthType";
 import { BaseService } from "./baseService";
 
 class AuthServcie extends BaseService {

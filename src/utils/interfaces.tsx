@@ -9,9 +9,9 @@ export interface MetaState {
     page: number;
     page_size: number;
     search: string;
-    sort: string;
+    sort: any;
     filter: string;
-    total: number;
+    total?: number;
 }
 export interface ItemSelect {
     id: string;

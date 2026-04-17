@@ -5,82 +5,69 @@ import type { CustomJwtPayload } from "../../types/JwtPayload";
 export interface AuthState {
     nguoi_dung_id: string | null;
     accessToken: string | null;
-    permissions: string[] | string;
+    permissions: string[];
     menu: any[];
     isAuthenticated: boolean;
     loading: boolean;
-    vai_tro: string[] | string;
+    vai_tro: string[];
 }
 
 const initialState: AuthState = {
     nguoi_dung_id: null,
     accessToken: null,
-    isAuthenticated: false,
     permissions: [],
     menu: [],
     vai_tro: [],
+    isAuthenticated: false,
     loading: false
+};
+
+const applyTokenData = (state: AuthState, token: string) => {
+    const decodeToken = jwtDecode<CustomJwtPayload>(token);
+
+    state.accessToken = token;
+    state.nguoi_dung_id = decodeToken.jti;
+    state.vai_tro = Array.isArray(decodeToken.vai_tro)
+        ? decodeToken.vai_tro
+        : decodeToken.vai_tro
+            ? [decodeToken.vai_tro]
+            : [];
+
+    state.permissions = Array.isArray(decodeToken.permissions)
+        ? decodeToken.permissions
+        : decodeToken.permissions
+            ? [decodeToken.permissions]
+            : [];
+
+    state.menu = decodeToken.menu
+        ? JSON.parse(decodeToken.menu)
+        : [];
+
+    state.isAuthenticated = true;
 };
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setLogin: (
-            state,
-            action: PayloadAction<string>
-        ) => {
-            const decodeToken = jwtDecode<CustomJwtPayload>(
-                action.payload
-            );
-            state.accessToken = action.payload;
-            state.nguoi_dung_id = decodeToken.jti;
-            state.vai_tro = decodeToken.vai_tro;
-            state.permissions = decodeToken.permissions || [];
-            state.menu = decodeToken.menu
-                ? JSON.parse(decodeToken.menu)
-                : [];
-            state.isAuthenticated = true;
+        setLogin: (state, action: PayloadAction<string>) => {
+            applyTokenData(state, action.payload);
         },
 
-        setAccessToken: (
-            state,
-            action: PayloadAction<string>
-        ) => {
-            const decodeToken = jwtDecode<CustomJwtPayload>(
-                action.payload
-            );
-            state.accessToken = action.payload;
-            state.nguoi_dung_id = decodeToken.jti;
-            state.permissions = decodeToken.permissions || [];
-            state.vai_tro = decodeToken.vai_tro;
-            state.menu = decodeToken.menu
-                ? JSON.parse(decodeToken.menu)
-                : [];
-            state.isAuthenticated = true;
+        setAccessToken: (state, action: PayloadAction<string>) => {
+            applyTokenData(state, action.payload);
         },
 
-        setMenu: (
-            state,
-            action: PayloadAction<any[]>
-        ) => {
+        setMenu: (state, action: PayloadAction<any[]>) => {
             state.menu = action.payload;
         },
 
-        logout: (state) => {
-            state.accessToken = null;
-            state.nguoi_dung_id = null;
-            state.permissions = [];
-            state.menu = [];
-            state.vai_tro = [];
-            state.isAuthenticated = false;
+        setLoading: (state, action: PayloadAction<boolean>) => {
+            state.loading = action.payload;
         },
 
-        setLoading: (
-            state,
-            action: PayloadAction<boolean>
-        ) => {
-            state.loading = action.payload;
+        logout: (state) => {
+            Object.assign(state, initialState);
         }
     }
 });

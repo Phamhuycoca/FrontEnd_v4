@@ -8,8 +8,3 @@ export type CommonButtonProps = ButtonProps & {
     text: string;
     icon?: string | ReactNode;
 };
-export type ConifyProps = {
-    icon: string;
-    width?: string | number;
-    height?: string | number;
-};

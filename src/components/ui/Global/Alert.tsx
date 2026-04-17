@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { App } from 'antd';
-import alertService, { type AlertState } from '../../../services/alert-service';
+import alertService, { type AlertState } from '../../../utils/services/alert-service';
 
 export const GlobalAlert: React.FC = () => {
     const { modal } = App.useApp();
@@ -14,6 +14,9 @@ export const GlobalAlert: React.FC = () => {
                         title: state.title || 'Thành công',
                         content: state.content,
                         okText: 'Đóng',
+                        onOk: () => {
+                            alertService.clear();
+                        }
                     });
                     break;
 
@@ -22,6 +25,9 @@ export const GlobalAlert: React.FC = () => {
                         title: state.title || 'Lỗi',
                         content: state.content,
                         okText: 'Đóng',
+                        onOk: () => {
+                            alertService.clear();
+                        }
                     });
                     break;
 
@@ -30,6 +36,9 @@ export const GlobalAlert: React.FC = () => {
                         title: state.title || 'Cảnh báo',
                         content: state.content,
                         okText: 'Đóng',
+                        onOk: () => {
+                            alertService.clear();
+                        }
                     });
                     break;
 
@@ -38,6 +47,9 @@ export const GlobalAlert: React.FC = () => {
                         title: state.title || 'Thông tin',
                         content: state.content,
                         okText: 'Đóng',
+                        onOk: () => {
+                            alertService.clear();
+                        }
                     });
                     break;
             }

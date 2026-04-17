@@ -1,9 +1,9 @@
 import { Button } from 'antd';
 import type { CommonButtonProps } from './ButtonProps';
-import { Conify } from '../Icon';
+import { Icon } from '../Icon';
 
 export const CommonButton = ({ icon, text, ...rest }: CommonButtonProps) => {
-    const renderIcon = typeof icon === 'string' ? <Conify icon={icon} /> : icon;
+    const renderIcon = typeof icon === 'string' ? <Icon icon={icon} /> : icon;
     return (
         <Button icon={renderIcon} {...rest}>
             {text}

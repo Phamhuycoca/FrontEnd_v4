@@ -8,3 +8,7 @@ export interface DanhMucType {
     cap_cha_id: string;
     children?: DanhMucType[];
 }
+export interface VaiTroDanhMucTroType {
+    vai_tro_id: string;
+    list_danh_muc_id: [];
+}   

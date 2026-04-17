@@ -2,7 +2,7 @@ import { Breadcrumb, Col, Row } from "antd";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { TableList } from "../../components/ui/Table";
 import { useEffect, useState } from "react";
-import vaiTroService from "../../services/vai-tro-service";
+import vaiTroService from "../../utils/services/vai-tro-service";
 import { useAppSelector } from "../../redux/hooks";
 import { useDispatch } from "react-redux";
 import { setData, setMeta } from "../../redux/slice/vaitroSlice";
@@ -57,7 +57,7 @@ export const EpsList = () => {
                 items={[{ title: 'Trang chủ' }, { title: 'Quản lý vai trò' }]}
                 className="mb-3"
             />
-            <Row gutter={16}>
+            <Row gutter={[16, 16]}>
                 <Col md={12}>
                     <Row gutter={[0, 16]}>
                         <Col span={24}>

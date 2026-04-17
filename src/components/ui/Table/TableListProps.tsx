@@ -1,7 +1,6 @@
 import type { TableProps } from 'antd';
 
 export type TableListProps = TableProps & {
-    key?: string;
     page?: number;
     page_size?: number;
     sort?: string;

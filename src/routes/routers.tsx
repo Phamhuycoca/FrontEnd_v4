@@ -3,6 +3,8 @@ import type { TypeRouter } from "../types/RouterType";
 import { DangNhapPage } from "../pages/dang-nhap";
 import VaiTroModule from "../modules/dm-vai-tro";
 import DanhMucModule from "../modules/dm-danh-muc";
+import NguiDungModule from "../modules/dm-nguoi-dung";
+import ChucNangModule from "../modules/dm-chuc-nang";
 import { AdminLayout } from "../components/layouts";
 import LoadingPage from "../pages/loading-page";
 
@@ -22,6 +24,14 @@ const Routers: TypeRouter[] = [
             {
                 path: 'quan-ly-danh-muc/*',
                 element: <DanhMucModule />
+            },
+            {
+                path: 'quan-ly-nguoi-dung/*',
+                element: <NguiDungModule />
+            },
+            {
+                path: 'quan-ly-chuc-nang/*',
+                element: <ChucNangModule />
             }
         ]
     },

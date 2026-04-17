@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Modal } from 'antd';
-import type { ConfirmModalState } from '../../../services/confirm-service';
-import confirmService from '../../../services/confirm-service';
+import type { ConfirmModalState } from '../../../utils/services/confirm-service';
+import confirmService from '../../../utils/services/confirm-service';
 
 export const GlobalConfirm = () => {
     const [state, setState] = useState<ConfirmModalState | null>(null);

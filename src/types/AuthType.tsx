@@ -8,6 +8,7 @@ interface MenuResponse {
     ten: string;
     icon?: string;
     duong_dan?: string;
+    so_thu_tu?: number;
     children?: MenuResponse[];
 }
 interface VaiTroResponse {

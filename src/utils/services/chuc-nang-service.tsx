@@ -1,14 +1,14 @@
-import type { DanhMucType } from "../modules/dm-danh-muc/danh-muc";
+import type { ChucNangType } from "../../modules/dm-chuc-nang/chuc-nang";
 import { BaseService } from "./baseService";
 
-class DanhMucService extends BaseService {
+class ChucNangService extends BaseService {
     constructor() {
-        super('danh-muc')
+        super('chuc-nang');
     }
-    create(data: DanhMucType) {
+    create(data: ChucNangType) {
         return this.post(data);
     }
-    update(id: string, data: DanhMucType) {
+    update(id: string, data: ChucNangType) {
         return this.put(id, data)
     }
     delete(id: string) {
@@ -21,4 +21,4 @@ class DanhMucService extends BaseService {
         return this.getOne(id)
     }
 }
-export default new DanhMucService;
+export default new ChucNangService();

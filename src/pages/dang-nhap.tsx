@@ -1,36 +1,32 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Flex, Form, Image, Input, Row, Typography, message } from "antd";
+import { Button, Checkbox, Flex, Form, Image, Input, Row, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
-import authService from "../services/auth-service";
+import authService from "../utils/services/auth-service";
 import type { AuthResponse } from "../types/AuthType";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "../redux/hooks";
-import { logout, setLogin } from "../redux/slice/authSlice";
+import { logout, setLoading, setLogin } from "../redux/slice/authSlice";
+import messageService from "../utils/services/message-service";
 
 export const DangNhapPage = () => {
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const dispatch = useAppDispatch();
     useEffect(() => {
         dispatch(logout());
     }, []);
     const onFinish = (values: any) => {
-        setLoading(true);
+        dispatch(setLoading(true));
         setError('');
         authService.dangNhap(values).subscribe((res: AuthResponse) => {
             dispatch(setLogin(res.access_token));
-            messageApi.open({
-                type: 'success',
-                content: 'Đăng nhập thành công',
-            });
-            setLoading(false);
+            messageService.success('Đăng nhập thành công');
             navigate('/loading');
         }, err => {
-            setLoading(false);
+            messageService.error('Đăng nhập thất bại');
             console.log(err?.response.data.Message);
             setError(err?.response.data.Message);
+            dispatch(setLoading(false));
         })
     };
     return (
@@ -43,7 +39,6 @@ export const DangNhapPage = () => {
                 maxWidth: '100%',
             }}
         >
-            {contextHolder}
             <Form
                 name="login"
                 initialValues={{ remember: true }}
@@ -71,7 +66,7 @@ export const DangNhapPage = () => {
                     <Input prefix={<LockOutlined />} type="password" placeholder="Nhập mật khẩu" />
                 </Form.Item>
                 {
-                    error !== '' && <Typography.Text type="warning">{error}</Typography.Text>
+                    error !== '' && <Typography.Text type="danger">{error}</Typography.Text>
                 }
                 <Form.Item>
                     <Flex justify="space-between" align="center">
@@ -83,7 +78,7 @@ export const DangNhapPage = () => {
                 </Form.Item>
 
                 <Form.Item>
-                    <Button loading={loading} block type="primary" htmlType="submit">
+                    <Button block type="primary" htmlType="submit">
                         Đăng nhập
                     </Button>
                 </Form.Item>
