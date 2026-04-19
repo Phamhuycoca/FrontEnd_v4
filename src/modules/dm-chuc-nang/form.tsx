@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { ChucNangType } from "./chuc-nang";
 import confirmService from "../../utils/services/confirm-service";
 import chucNangService from "../../utils/services/chuc-nang-service";
+import { IUpload } from "../../components/ui/Upload";
 
 export const EpsForm = () => {
     const navigate = useNavigate();
@@ -123,6 +124,7 @@ export const EpsForm = () => {
                     </Form.Item>
                 </Form>
             </Spin>
+            <IUpload />
         </>
     )
 }
