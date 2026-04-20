@@ -24,6 +24,7 @@ const initialState: AuthState = {
 
 const applyTokenData = (state: AuthState, token: string) => {
     const decodeToken = jwtDecode<CustomJwtPayload>(token);
+    console.log('decodeToken', decodeToken);
 
     state.accessToken = token;
     state.nguoi_dung_id = decodeToken.jti;
@@ -55,6 +56,8 @@ const authSlice = createSlice({
         },
 
         setAccessToken: (state, action: PayloadAction<string>) => {
+            console.log('state, action.payload', state, action.payload);
+
             applyTokenData(state, action.payload);
         },
 

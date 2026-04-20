@@ -7,6 +7,7 @@ import type { NguoiDungType } from "./nguoi-dung";
 import nguoiDungService from "../../utils/services/nguoi-dung-service";
 import { listTrangThai } from "./const";
 import messageService from "../../utils/services/message-service";
+import { IUpload } from "../../components/ui/Upload";
 export const EpsForm = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
@@ -139,6 +140,9 @@ export const EpsForm = () => {
                     </Form.Item>
                     <Form.Item label="Tên đăng nhập" name="ten_dang_nhap">
                         <Input disabled={editMode} />
+                    </Form.Item>
+                    <Form.Item label="Tên đăng nhập" name="anh_dai_dien" >
+                        <IUpload disabled={editMode} multiple={false} />
                     </Form.Item>
                     <Form.Item label="Khóa tài khoản" name="khoa_tai_khoan" initialValue={false}>
                         <Select disabled={editMode} allowClear options={listTrangThai} />

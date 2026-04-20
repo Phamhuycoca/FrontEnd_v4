@@ -6,7 +6,7 @@ class AuthServcie extends BaseService {
         super('auth');
     }
     dangNhap(data: any) {
-        return this.customPost<AuthResponse>('/dang-nhap', data)
+        return this.customPost<AuthResponse>('Admin/dang-nhap', data)
     }
 }
 export default new AuthServcie();

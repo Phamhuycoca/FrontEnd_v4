@@ -7,9 +7,7 @@ import {
     SaveOutlined,
     UserDeleteOutlined,
 } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
 import {
-    Avatar,
     Badge,
     Button,
     Col,
@@ -24,24 +22,9 @@ import {
 import { Outlet } from 'react-router-dom';
 import { createStyles } from 'antd-style';
 import { MenuComponent } from '../../ui/Menu';
+import { User } from '../../ui/User';
 const { Header, Content, Sider } = Layout;
-const items: MenuProps['items'] = [
-    {
-        label: 'Thông tin tài khoản',
-        key: '0',
-    },
-    {
-        label: 'Cài đặt',
-        key: '1',
-    },
-    {
-        type: 'divider',
-    },
-    {
-        label: 'Đăng xuất',
-        key: '3',
-    },
-];
+
 type ListMemu = {
     key?: string;
     icon?: React.ReactNode;
@@ -191,60 +174,7 @@ const AdminLayout: React.FC = () => {
                                         </a>
                                     </Dropdown>
 
-                                    <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 10,
-                                                cursor: 'pointer',
-                                                maxWidth: 200,
-                                            }}
-                                        >
-                                            <Avatar
-                                                size={42}
-                                                src={
-                                                    <img
-                                                        draggable={false}
-                                                        src={
-                                                            'https://res.cloudinary.com/drhdgw1xx/image/upload/v1775572508/624160754_1571978107342366_7527978856429040370_n_wftvvn.jpg'
-                                                        }
-                                                        alt="avatar"
-                                                    />
-                                                }
-                                            />
-
-                                            <div
-                                                style={{
-                                                    flex: 1,
-                                                    minWidth: 0,
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    lineHeight: 1.2,
-                                                }}
-                                            >
-                                                <span
-                                                    style={{
-                                                        overflow: 'hidden',
-                                                        textOverflow: 'ellipsis',
-                                                        whiteSpace: 'nowrap',
-                                                        fontWeight: 600,
-                                                    }}
-                                                >
-                                                    Phạm Khắc Huy
-                                                </span>
-
-                                                <span
-                                                    style={{
-                                                        fontSize: 12,
-                                                        color: '#8c8c8c',
-                                                    }}
-                                                >
-                                                    🟢 Online
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Dropdown>
+                                    <User />
                                 </Space>
                             </Col>
                         </Row>

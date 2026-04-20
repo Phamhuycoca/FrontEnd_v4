@@ -14,7 +14,7 @@ function App() {
     <>
       <section id="center">
         <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
+          <img src={'http://localhost:9000/files/ad854625-6834-4464-b2a0-8e2c5a7557fb_624160754_1571978107342366_7527978856429040370_n (1) (1).jpg'} className="base" width="170" height="179" alt="" />
           <img src={reactLogo} className="framework" alt="React logo" />
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>

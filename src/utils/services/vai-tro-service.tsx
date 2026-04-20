@@ -3,7 +3,7 @@ import { BaseService } from "./baseService";
 
 class VaiTroService extends BaseService {
     constructor() {
-        super('vai-tro');
+        super('Admin/vai-tro');
     }
     create(data: VaiTroType) {
         return this.post(data);

@@ -3,7 +3,7 @@ import type { NguoiDungType } from '../../modules/dm-nguoi-dung/nguoi-dung';
 
 class NguoiDungService extends BaseService {
     constructor() {
-        super('nguoi-dung');
+        super('Admin/nguoi-dung');
     }
     create(data: NguoiDungType) {
         return this.post(data);

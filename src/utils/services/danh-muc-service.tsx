@@ -3,7 +3,7 @@ import { BaseService } from "./baseService";
 
 class DanhMucService extends BaseService {
     constructor() {
-        super('danh-muc')
+        super('Admin/danh-muc')
     }
     create(data: DanhMucType) {
         return this.post(data);

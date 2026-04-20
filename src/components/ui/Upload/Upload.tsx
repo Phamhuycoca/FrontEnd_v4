@@ -1,118 +1,162 @@
 import { Button, Spin, Tooltip, Upload, message } from "antd";
-import React, { useState } from "react";
-import { DeleteOutlined, DownloadOutlined, UploadOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import {
+    DeleteOutlined,
+    DownloadOutlined,
+    UploadOutlined
+} from "@ant-design/icons";
 import confirmService from "../../../utils/services/confirm-service";
 
 interface IUploadProps {
     disabled?: boolean;
+    multiple?: boolean;
+    editMode?: boolean;
+    value?: UploadedFile[];
+    onChange?: (value: string | string[] | null) => void;
 }
 
 interface UploadedFile {
-    uid: string; // UID của Ant Design
+    uid: string;
     name: string;
-    status: "done" | "error" | "uploading"; // Chỉ nhận giá trị "done" hoặc "error"
-    id?: string; // UUID từ server,
+    status: "done" | "error" | "uploading";
+    id?: string;
     url?: string;
 }
 
-export const IUpload: React.FC<IUploadProps> = ({ disabled = false }) => {
+export const IUpload: React.FC<IUploadProps> = ({
+    disabled = false,
+    multiple = false,
+    editMode = false,
+    value = [],
+    onChange
+}) => {
     const url = "http://localhost:5110/api/file";
+
     const [fileList, setFileList] = useState<UploadedFile[]>([]);
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
-    const setLoading = (uid: string, value: boolean) => {
-        setLoadingMap(prev => ({ ...prev, [uid]: value }));
+
+    // ================= SYNC EDIT MODE =================
+    useEffect(() => {
+        if (editMode && value?.length) {
+            const normalized = value.map((f, index) => ({
+                uid: f.uid || f.id || `${index}`,
+                name: f.name || "file",
+                status: "done" as const,
+                id: f.id,
+                url: f.url
+            }));
+            setFileList(normalized);
+        }
+    }, [editMode, value]);
+
+    const emitChange = (list: UploadedFile[]) => {
+        const newList = multiple ? list : list.slice(0, 1);
+
+        setFileList(newList);
+
+        const result = multiple
+            ? newList.map(x => x.id).filter(Boolean)
+            : newList[0]?.id || null;
+
+        onChange?.(result);
     };
-    // Upload từng file
+
+    const setLoading = (uid: string, val: boolean) => {
+        setLoadingMap(prev => ({ ...prev, [uid]: val }));
+    };
+
+    // ================= UPLOAD =================
     const customUpload = async (options: any) => {
         const { file, onSuccess, onError } = options;
 
-        // 👉 thêm file ngay lập tức
         const tempFile: UploadedFile = {
             uid: file.uid,
             name: file.name,
             status: "uploading"
         };
 
-        setFileList(prev => [...prev, tempFile]);
+        const newList = multiple ? [...fileList, tempFile] : [tempFile];
+        emitChange(newList);
+
         setLoading(file.uid, true);
 
         const formData = new FormData();
         formData.append("files", file);
 
         try {
-            const response = await fetch(url, {
+            const res = await fetch(url, {
                 method: "POST",
-                body: formData,
+                body: formData
             });
 
-            if (!response.ok) throw new Error();
+            if (!res.ok) throw new Error();
 
-            const result = await response.json();
+            const result = await res.json();
 
-            // 👉 update thành công
-            setFileList(prev =>
-                prev.map(f =>
-                    f.uid === file.uid
-                        ? {
-                            ...f,
-                            status: "done",
-                            id: result.data[0].id,
-                            url: result.data[0].file_path
-                        }
-                        : f
-                )
+            const updated = newList.map(f =>
+                f.uid === file.uid
+                    ? {
+                        ...f,
+                        status: "done" as const,
+                        id: result.data[0].id,
+                        url: result.data[0].file_path
+                    }
+                    : f
             );
 
-            message.success(`${file.name} tải thành công`);
+            emitChange(updated);
+
+            message.success(`${file.name} upload thành công`);
             onSuccess("ok");
-        } catch (error) {
-            // ❌ remove nếu fail
-            setFileList(prev =>
-                prev.filter(f => f.uid !== file.uid)
-            );
+        } catch (err) {
+            const failed = multiple
+                ? newList.filter(f => f.uid !== file.uid)
+                : [];
+
+            emitChange(failed);
 
             message.error(`${file.name} upload thất bại`);
-            onError(error);
+            onError(err);
         } finally {
             setLoading(file.uid, false);
         }
     };
 
-    // Xóa file bằng UUID
+    // ================= REMOVE =================
     const handleRemove = async (file: UploadedFile) => {
         if (!file.id) return;
 
         setLoading(file.uid, true);
 
         try {
-            const response = await fetch(`${url}/${file.id}`, {
-                method: "DELETE",
+            const res = await fetch(`${url}/${file.id}`, {
+                method: "DELETE"
             });
 
-            if (response.ok) {
-                setFileList(prev => prev.filter(x => x.id !== file.id));
-                message.success("Xóa thành công");
-            } else {
-                throw new Error();
-            }
+            if (!res.ok) throw new Error();
+
+            const newList = fileList.filter(x => x.id !== file.id);
+            emitChange(newList);
+
+            message.success("Xóa thành công");
         } catch {
             message.error("Xóa thất bại");
         } finally {
             setLoading(file.uid, false);
         }
     };
+
+    // ================= DOWNLOAD =================
     const handleDownload = async (file: UploadedFile) => {
         if (!file.id) return;
 
         setLoading(file.uid, true);
 
         try {
-            const response = await fetch(`${url}/download/${file.id}`);
+            const res = await fetch(`${url}/download/${file.id}`);
+            if (!res.ok) throw new Error();
 
-            if (!response.ok) throw new Error();
-
-            const blob = await response.blob();
-
+            const blob = await res.blob();
             const downloadUrl = window.URL.createObjectURL(blob);
 
             const a = document.createElement("a");
@@ -127,15 +171,18 @@ export const IUpload: React.FC<IUploadProps> = ({ disabled = false }) => {
             setLoading(file.uid, false);
         }
     };
+
+    // ================= UI =================
     return (
         <Upload
             customRequest={customUpload}
             fileList={fileList}
             disabled={disabled}
-            multiple
+            multiple={multiple}
+            maxCount={multiple ? undefined : 1}
             onPreview={(file: UploadedFile) => {
                 if (file.status === "uploading") return;
-                window.open(file.url, "_blank");
+                if (file.url) window.open(file.url, "_blank");
             }}
             itemRender={(originNode, file: any) => {
                 const f = file as UploadedFile;
@@ -154,29 +201,23 @@ export const IUpload: React.FC<IUploadProps> = ({ disabled = false }) => {
             showUploadList={{
                 showDownloadIcon: !disabled,
 
-                // REMOVE ICON có loading
                 removeIcon: (file) => {
-                    const isLoading = loadingMap[file.uid];
+                    const loading = loadingMap[file.uid];
 
-                    return isLoading ? (
-                        <Tooltip title="Đang xử lý...">
-                            <Spin size="small" />
-                        </Tooltip>
+                    return loading ? (
+                        <Spin size="small" />
                     ) : (
-                        <Tooltip title="Xóa tệp đính kèm">
+                        <Tooltip title="Xóa">
                             <DeleteOutlined />
                         </Tooltip>
                     );
                 },
 
-                // DOWNLOAD ICON
                 downloadIcon: (file) => {
-                    const isLoading = loadingMap[file.uid];
+                    const loading = loadingMap[file.uid];
 
-                    return isLoading ? (
-                        <Tooltip title="Đang xử lý...">
-                            <Spin size="small" />
-                        </Tooltip>
+                    return loading ? (
+                        <Spin size="small" />
                     ) : (
                         <Tooltip title="Tải xuống">
                             <DownloadOutlined />
@@ -186,9 +227,14 @@ export const IUpload: React.FC<IUploadProps> = ({ disabled = false }) => {
             }}
             onRemove={async (file) => {
                 if (loadingMap[file.uid]) return;
-                const result = await confirmService.confirm('Thông báo', 'Bạn có muốn xóa tệp đính kèm này')
-                if (result) {
-                    handleRemove(file as UploadedFile);
+
+                const ok = await confirmService.confirm(
+                    "Thông báo",
+                    "Bạn có muốn xóa file này?"
+                );
+
+                if (ok) {
+                    await handleRemove(file as UploadedFile);
                 }
             }}
             onDownload={(file) => {
@@ -196,9 +242,11 @@ export const IUpload: React.FC<IUploadProps> = ({ disabled = false }) => {
                 handleDownload(file as UploadedFile);
             }}
         >
-            <Button icon={<UploadOutlined />} disabled={disabled}>
-                Click to Upload
-            </Button>
+            {!disabled ?
+                <Button icon={<UploadOutlined />}>
+                    Tải tệp đính kèm
+                </Button> : null
+            }
         </Upload>
     );
 };

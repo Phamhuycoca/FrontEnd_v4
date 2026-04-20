@@ -3,7 +3,7 @@ import { BaseService } from "./baseService";
 
 class ChucNangService extends BaseService {
     constructor() {
-        super('chuc-nang');
+        super('Admin/chuc-nang');
     }
     create(data: ChucNangType) {
         return this.post(data);
